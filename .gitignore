@@ -109,3 +109,7 @@ Pipfile.lock
 
 # package specific
 Unrar.exe
+
+# Sublime Text
+.sublime-project
+.sublime-workspace

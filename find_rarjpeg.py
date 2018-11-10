@@ -1,37 +1,51 @@
-import re
-import os
-import zipfile
-import rarfile
+import argparse
+import logging
+import pathlib
+
+from rarjpeg_class import Rarjpeg
 
 
-SIGNATURES = {
-    'ZIP_NORMAL': b'PK\x03\x04', 'ZIP_EMPTY': b'PK\x05\x06',
-    'ZIP_SPANNED': b'PK\x07\x08',
-    'RAR_1.50': b'Rar!\x1a\x07\x00', 'RAR_5.0': b'Rar!\x1a\x07\x01\x00'
-}
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%H:%M:%S %d.%m.%Y')
+logger = logging.getLogger(__name__)
 
 
-def is_valid(byte_str, offset):
-
-    with open('test.rar', 'wb') as f:
-        f.write(byte_str[offset:])
-
-    if (zipfile.is_zipfile('test.rar') or
-            rarfile.is_rarfile('test.rar')):
-        os.remove('test.rar')
-        return True
-
-    os.remove('test.rar')
-    return False
+parser = argparse.ArgumentParser(usage="%(prog)s target [-h]",
+                                 description="Checks target image/folder for rarjpeg(-s).")
+parser.add_argument('target', help='name of the file or directory to check')
+parser.add_argument('-e', '--extract', action='store_true', default=False,
+                    help='extract files from found rarjpegs')
 
 
-def is_rarjpeg(rarjpeg):
+def check(rarjpeg_path, extract=False):
 
-    with open(rarjpeg, 'rb') as f:
-        byte_str = f.read()
+    rarjpeg = Rarjpeg(rarjpeg_path)
+    valid = rarjpeg.check()
+    logging.info(f"{rarjpeg.name} is {'valid' if valid else 'invalid'}")
 
-    for name, signature in SIGNATURES.items():
-        search = re.search(signature, byte_str)
-        if search:
-            offset = search.start()
-            return is_valid(byte_str, offset)
+    if extract:
+        extracted, msg = rarjpeg.extract()
+        logging.info(
+            f"{rarjpeg.archive} {'was extracted' if extracted else 'was not extracted,'} {msg}\n")
+
+
+def main():
+    args = parser.parse_args()
+
+    if args.target:
+        path = pathlib.Path.cwd() / args.target.lstrip('/')
+        if path.is_file():
+            check(path, args.extract)
+        elif path.is_dir():
+            for image in path.iterdir():
+                if image.suffix == '.jpg':
+                    check(image, args.extract)
+        else:
+            logger.error('Something went wrong!\n')
+            parser.print_help()
+
+
+if __name__ == '__main__':
+    main()
