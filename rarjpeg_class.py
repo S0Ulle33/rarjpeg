@@ -10,6 +10,7 @@ SIGNATURES = {
     'ZIP_SPANNED': b'PK\x07\x08',
     'RAR_1.50': b'Rar!\x1a\x07\x00', 'RAR_5.0': b'Rar!\x1a\x07\x01\x00'
 }
+EXTRACT_FOLDER = 'extracted_rarjpegs'
 
 
 class Rarjpeg:
@@ -61,7 +62,7 @@ class Rarjpeg:
         with open(self.archive, 'wb') as f:
             f.write(self._bytes[self._offset:])
 
-        path_to_extract = str(pathlib.Path.cwd() / 'extracted_rarjpegs' /
+        path_to_extract = str(pathlib.Path.cwd() / EXTRACT_FOLDER /
                               self.name.with_suffix(''))
 
         func = {'RAR': rarfile.RarFile,

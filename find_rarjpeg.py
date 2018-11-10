@@ -12,9 +12,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-parser = argparse.ArgumentParser(usage="%(prog)s target [-h]",
-                                 description="Checks target image/folder for rarjpeg(-s).")
-parser.add_argument('target', help='name of the file or directory to check')
+parser = argparse.ArgumentParser(usage="%(prog)s TARGET [-e]",
+                                 description="Checks TARGET image or folder for rarjpeg(-s).")
+parser.add_argument('target', help='name of the FILE or DIRECTORY to check')
 parser.add_argument('-e', '--extract', action='store_true', default=False,
                     help='extract files from found rarjpegs')
 
