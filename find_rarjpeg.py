@@ -3,6 +3,7 @@ import os
 import zipfile
 import rarfile
 
+
 SIGNATURES = {
     'ZIP_NORMAL': b'PK\x03\x04', 'ZIP_EMPTY': b'PK\x05\x06',
     'ZIP_SPANNED': b'PK\x07\x08',
