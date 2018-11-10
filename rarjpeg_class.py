@@ -49,6 +49,8 @@ class Rarjpeg:
         if (zipfile.is_zipfile(str(self.archive)) or
                 rarfile.is_rarfile(str(self.archive))):
             self._is_valid = True
+            os.remove(self.archive)
+            return
 
         os.remove(self.archive)
         self._is_valid = False

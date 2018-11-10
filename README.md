@@ -15,6 +15,7 @@ Requirements
 
 -   Python 3.6 or higher
 -   `rarfile`
+-   [UnRar](https://www.rarlab.com/download.htm)
 
 Installing
 ----------
