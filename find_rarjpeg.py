@@ -2,7 +2,7 @@ import argparse
 import logging
 import pathlib
 
-from rarjpeg_class import Rarjpeg
+from src.rarjpeg_class import Rarjpeg
 
 
 logging.basicConfig(
