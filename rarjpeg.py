@@ -1,12 +1,10 @@
-import re
 import pathlib
-import zipfile
-import logging
 import platform
+import re
+import zipfile
 
 import rarfile
 
-logger = logging.getLogger(__name__)
 
 if platform.system() == 'Windows':
     UNRAR_PATH = pathlib.Path().cwd() / 'UnRar.exe'
