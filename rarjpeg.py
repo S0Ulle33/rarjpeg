@@ -1,16 +1,30 @@
 import re
-import os
 import pathlib
 import zipfile
+import logging
+import platform
 
 import rarfile
+
+logger = logging.getLogger(__name__)
+
+if platform.system() == 'Windows':
+    UNRAR_PATH = pathlib.Path().cwd() / 'UnRar.exe'
+else:
+    UNRAR_PATH = pathlib.Path().cwd() / 'unrar'
+
+if not pathlib.Path(UNRAR_PATH).is_file():
+    raise FileNotFoundError(
+        f"Can not find unrar at {UNRAR_PATH}, make sure you download it")
+rarfile.UNRAR_TOOL = str(UNRAR_PATH)
+
 
 SIGNATURES = {
     'ZIP_NORMAL': b'PK\x03\x04', 'ZIP_EMPTY': b'PK\x05\x06',
     'ZIP_SPANNED': b'PK\x07\x08',
     'RAR_1.50': b'Rar!\x1a\x07\x00', 'RAR_5.0': b'Rar!\x1a\x07\x01\x00'
 }
-EXTRACT_FOLDER = 'extracted_rarjpegs'
+FOLDER_TO_EXTRACT = 'extracted_rarjpegs'
 
 
 class Rarjpeg:
@@ -29,10 +43,19 @@ class Rarjpeg:
         self._offset = None
         self._is_valid = None
 
+    @property
+    def is_valid(self):
+        if not self._is_valid:
+            self._check()
+
+        return self._is_valid
+
+    def __repr__(self):
+        return f"Rarjpeg('{self.path}')"
+
     def _find_signature(self):
 
-        with open(self.path, 'rb') as f:
-            self._bytes = f.read()
+        self._bytes = self.path.read_bytes()
 
         for name, signature in SIGNATURES.items():
             found_signature = re.search(signature, self._bytes)
@@ -43,28 +66,31 @@ class Rarjpeg:
 
     def _check_archive(self):
 
-        with open(self.archive, 'wb') as f:
-            f.write(self._bytes[self._offset:])
+        self.archive.write_bytes(self._bytes[self._offset:])
 
         if (zipfile.is_zipfile(str(self.archive)) or
                 rarfile.is_rarfile(str(self.archive))):
             self._is_valid = True
-            os.remove(self.archive)
+            self.archive.unlink()
             return
 
-        os.remove(self.archive)
+        self.archive.unlink()
         self._is_valid = False
         return
+
+    def _check(self):
+
+        self._find_signature()
+        self._check_archive()
 
     def extract(self):
 
         if not self._is_valid:
             return False, "there is no archive"
 
-        with open(self.archive, 'wb') as f:
-            f.write(self._bytes[self._offset:])
+        self.archive.write_bytes(self._bytes[self._offset:])
 
-        path_to_extract = str(pathlib.Path.cwd() / EXTRACT_FOLDER /
+        path_to_extract = str(pathlib.Path.cwd() / FOLDER_TO_EXTRACT /
                               self.name.with_suffix(''))
 
         func = {'RAR': rarfile.RarFile,
@@ -73,17 +99,10 @@ class Rarjpeg:
         try:
             archive = func[self.type](str(self.archive))
             archive.extractall(path=path_to_extract)
-        except Exception:
+        except Exception as e:
             return False, "requires password"
         finally:
-            os.remove(self.archive)
             archive.close()
+            self.archive.unlink()
 
         return True, "successfully"
-
-    def check(self):
-
-        self._find_signature()
-        self._check_archive()
-
-        return self._is_valid

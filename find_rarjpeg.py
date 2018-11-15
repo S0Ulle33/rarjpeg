@@ -1,8 +1,9 @@
 import argparse
 import logging
 import pathlib
+import sys
 
-from src.rarjpeg_class import Rarjpeg
+from rarjpeg import Rarjpeg
 
 
 logging.basicConfig(
@@ -22,7 +23,7 @@ parser.add_argument('-e', '--extract', action='store_true', default=False,
 def check(rarjpeg_path, extract=False):
 
     rarjpeg = Rarjpeg(rarjpeg_path)
-    valid = rarjpeg.check()
+    valid = rarjpeg.is_valid
     logging.info(f"{rarjpeg.name} is {'valid' if valid else 'invalid'}")
 
     if extract:
@@ -32,10 +33,17 @@ def check(rarjpeg_path, extract=False):
 
 
 def main():
+
+    if len(sys.argv) <= 1:
+        parser.print_help()
+
     args = parser.parse_args()
 
     if args.target:
         path = pathlib.Path.cwd() / args.target.lstrip('/')
+        if not path.exists():
+            logger.error(f"Can not find '{path}', please check again!")
+            return
         if path.is_file():
             check(path, args.extract)
         elif path.is_dir():
