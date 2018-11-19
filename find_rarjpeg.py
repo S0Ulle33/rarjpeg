@@ -44,7 +44,7 @@ def main():
         if not path.exists():
             logger.error(f"Can not find '{path}', please check again!")
             return
-        if path.is_file():
+        elif path.is_file():
             check(path, args.extract)
         elif path.is_dir():
             for image in path.iterdir():

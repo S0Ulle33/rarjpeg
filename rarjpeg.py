@@ -5,12 +5,8 @@ import zipfile
 
 import rarfile
 
-
-if platform.system() == 'Windows':
-    UNRAR_PATH = pathlib.Path().cwd() / 'UnRar.exe'
-else:
-    UNRAR_PATH = pathlib.Path().cwd() / 'unrar'
-
+UNRAR_NAME = 'UnRar.exe' if platform.system() == 'Windows' else 'unrar'
+UNRAR_PATH = pathlib.Path().cwd() / UNRAR_NAME
 if not pathlib.Path(UNRAR_PATH).is_file():
     raise FileNotFoundError(
         f"Can not find unrar at {UNRAR_PATH}, make sure you download it")
@@ -49,7 +45,7 @@ class Rarjpeg:
         return self._is_valid
 
     def __repr__(self):
-        return f"Rarjpeg('{self.path}')"
+        return f"{self.__class__.__name__}('{self.path}')"
 
     def _find_signature(self):
 
