@@ -17,6 +17,7 @@ Requirements
 -   `rarfile`
 -   [UnRar](https://www.rarlab.com/download.htm)
 
+
 Installing
 ----------
 
@@ -39,7 +40,7 @@ or using pipenv.
 Usage
 -----
 
-Folder to unpack by default is `extracted_rarjpegs`, you can specify that in `rarjpeg_class.py` in `EXTRACT_FOLDER` variable.
+Folder to unpack by default is `extracted_rarjpegs`, you can specify that in `rarjpeg.py` in `FOLDER_TO_EXTRACT` variable.
 
 ```
 usage: find_rarjpeg.py TARGET [-e]
