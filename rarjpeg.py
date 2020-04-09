@@ -5,12 +5,12 @@ import zipfile
 
 import rarfile
 
-UNRAR_NAME = 'UnRar.exe' if platform.system() == 'Windows' else 'unrar'
-UNRAR_PATH = pathlib.Path().cwd() / UNRAR_NAME
-if not pathlib.Path(UNRAR_PATH).is_file():
-    raise FileNotFoundError(
-        f"Can not find unrar at {UNRAR_PATH}, make sure you download it")
-rarfile.UNRAR_TOOL = str(UNRAR_PATH)
+if platform.system() == 'Windows':
+    UNRAR_NAME = 'UnRar.exe'
+    UNRAR_PATH = pathlib.Path().cwd() / UNRAR_NAME
+    if not pathlib.Path(UNRAR_PATH).is_file():
+        raise FileNotFoundError(f"Can't find unrar at {UNRAR_PATH}, make sure you download it")
+    rarfile.UNRAR_TOOL = str(UNRAR_PATH)
 
 
 SIGNATURES = {
